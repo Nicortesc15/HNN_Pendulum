@@ -62,6 +62,33 @@ def vector_field(states: torch.Tensor) -> torch.Tensor:
     dp_dt = -M * G * L * torch.sin(q)
 
     # Combine derivatives into a single tensor
-    derivatives = torch.stack([dq_dt, dp_dt], dim=1)
+    derivatives = torch.stack([dq_dt, dp_dt], dim=-1)
 
     return derivatives
+
+# Monte Carlo sampling for the single pendulum
+def monte_carlo_sampling(q_range = (-torch.pi, torch.pi), p_range = (-1, 1), samples = 1000) -> dict:
+    """
+    Generate training data for a NN using Monte Carlo sampling.
+
+    Args:
+        q_range (tuple): Range of q values.
+        p_range (tuple): Range of p values.
+        samples (int): Number of samples to generate.
+
+    Returns:
+        dict: Dictionary containing training data for NN.
+    """
+
+    # Randomly sample states
+    q_samples = torch.empty(samples).uniform_(*q_range)
+    p_samples = torch.empty(samples).uniform_(*p_range)
+
+    # Combine sampled states into a tensor
+    states = torch.stack([q_samples, p_samples], dim=1)
+
+    # Compute derivatives for all sampled states
+    derivatives = vector_field(states)
+
+    # Return data as a dictionary
+    return {'states': states, 'derivatives': derivatives}
