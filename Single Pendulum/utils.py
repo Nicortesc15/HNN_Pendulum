@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -7,6 +8,21 @@ from single_pendulum import hamiltonian
 
 M = constants.M
 L = constants.L
+
+# Create directory for saving plots
+PLOTS_DIR = os.path.join(os.path.dirname(__file__), "plots")
+os.makedirs(PLOTS_DIR, exist_ok=True)
+
+def save_plot(fig: plt.Figure, filename: str):
+    """
+    Save the matplotlib figure to the plots directory.
+
+    Args:
+        fig (plt.Figure): The matplotlib figure object.
+        filename (str): The name of the file to save the plot as.
+    """
+    filepath = os.path.join(PLOTS_DIR, filename)
+    fig.savefig(filepath)
 
 def plot_positions_in_cartesian(t: np.array, y: np.array, title : str):
     """
@@ -38,7 +54,13 @@ def plot_positions_in_cartesian(t: np.array, y: np.array, title : str):
     plt.legend()
     plt.grid(True)
     plt.axis('equal')
-    plt.show()
+
+    # Save
+    fig = plt.gcf()
+    filename = f"{title.replace(' ', '_').lower()}_cartesian_position.png"
+    save_plot(fig, filename)
+
+    plt.close(fig)
 
 def plot_hamiltonian_deviation_over_time(t: np.array, y: torch.tensor, title: str):
     """
@@ -61,7 +83,13 @@ def plot_hamiltonian_deviation_over_time(t: np.array, y: torch.tensor, title: st
     plt.xlabel('t')
     plt.ylabel('Rel. Deviation')
     plt.title(f'Relative Deviation of the Hamiltonian Function over Time for {title} solution')
-    plt.show()
+
+    # Save
+    fig = plt.gcf()
+    filename = f"{title.replace(' ', '_').lower()}_hamiltonian_deviation.png"
+    save_plot(fig, filename)
+
+    plt.close(fig)
 
 def plot_losses(loss_history: list, used_model: str):
     """
@@ -80,7 +108,13 @@ def plot_losses(loss_history: list, used_model: str):
     plt.title(f"Training Loss History for {used_model}")
     plt.legend()
     plt.grid(True)
-    plt.show()
+
+    # Save
+    fig = plt.gcf()
+    filename = f"{used_model.replace(' ', '_').lower()}_loss_curve.png"
+    save_plot(fig, filename)
+
+    plt.close(fig)
 
 
 def compare_hamiltonian_single_pendulum(model: nn.Module) -> None:
@@ -127,4 +161,8 @@ def compare_hamiltonian_single_pendulum(model: nn.Module) -> None:
     for ax in [ax1, ax2]:
         ax.set_zlim([h_min, h_max])
 
-    plt.show()
+    # Save
+    filename = "compare_true_vs_learned_hamiltonian.png"
+    save_plot(fig, filename)
+
+    plt.close(fig)
