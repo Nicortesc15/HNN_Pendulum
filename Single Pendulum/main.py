@@ -16,7 +16,7 @@ from single_pendulum import hamiltonian
 
 # Convert initial state into a torch tensor
 Y0 = torch.tensor(constants.Y0, dtype=torch.float32)
-T_spam = constants.T_spam
+T_span = constants.T_span
 
 def solve_numerically(selected_solver: str) -> None:
     """
@@ -39,7 +39,7 @@ def solve_numerically(selected_solver: str) -> None:
             raise ValueError(f"{selected_solver} is not a valid solver.")
 
     # Solve the system for initial state Y0 and time span t_span
-    t_values, y_values = func(single_pendulum.vector_field, "_", Y0, T_spam)
+    t_values, y_values = func(single_pendulum.vector_field, "_", Y0, T_span)
 
     # Plot the complete trajectory for the double pendulum over the whole time range
     utils.plot_positions_in_cartesian(t_values, y_values, selected_solver)
@@ -94,7 +94,7 @@ def learn_hamiltonian_and_solve(selected_model: str) -> nn.Module:
 
     # Use the trained network and solve with Symplectic Euler solver
     model.eval()
-    t_values, y_values = symplectic_euler.solve(model, selected_model, Y0, T_spam)
+    t_values, y_values = symplectic_euler.solve(model, selected_model, Y0, T_span)
 
     # Plot the complete trajectory for the single pendulum over the whole time range
     utils.plot_positions_in_cartesian(t_values, y_values, f"{selected_model} with Symplectic Euler")
